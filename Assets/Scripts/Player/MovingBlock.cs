@@ -1,8 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UIElements;
 
 public class MovingBlock : MonoBehaviour
 {
@@ -116,6 +113,7 @@ public class MovingBlock : MonoBehaviour
             {
                 /// Fail State here
                 ChangeState(ResetState());
+                ScoreManager.Instance.TriggerGameOver();
                 return false;
             }
 

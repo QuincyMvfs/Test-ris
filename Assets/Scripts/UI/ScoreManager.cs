@@ -15,7 +15,8 @@ public class ScoreManager : MonoBehaviour
 
     [SerializeField] private int _scoreAddedPerRow = 100;
 
-    public UnityEvent TargetScoreReached;
+    public UnityEvent OnTargetScoreReached;
+    public UnityEvent OnGameOver;
 
     private int _currentScore;
     private int _targetScore;
@@ -37,14 +38,21 @@ public class ScoreManager : MonoBehaviour
         _nextShapeText.text = block.BlockType.ToString();
     }
 
+    public void TriggerGameOver()
+    {
+        OnGameOver?.Invoke();
+    }
+
     public void AddScore()
     {
         _currentScore += _scoreAddedPerRow;
         if (_currentScore >= _targetScore)
         {
-            TargetScoreReached?.Invoke();
+            OnTargetScoreReached?.Invoke();
         }
-
-        _currentScoreText.text = _currentScore.ToString();
+        else
+        {
+            _currentScoreText.text = _currentScore.ToString();
+        }
     }
 }
