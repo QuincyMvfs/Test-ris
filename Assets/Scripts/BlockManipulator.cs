@@ -6,6 +6,7 @@ using UnityEngine;
 public class BlockManipulator : MonoBehaviour
 {
     [SerializeField] private LevelInfoScriptableObject _levelData;
+    [SerializeField] private AllShapesScritpableObject _allShapesData;
 
     // Scriptable Object Fields
     private List<BlockInfo> _blocks = new List<BlockInfo>();
@@ -82,61 +83,20 @@ public class BlockManipulator : MonoBehaviour
     public void SpawnBlock()
     {
         BlockInfo block = _nextBlock;
-        string[] shapeRowStrings = GetShapeTextData(block).Split("\n");
         _nextBlock = GetBlockToSpawn();
         ScoreManager.Instance.SetNextShapeText(_nextBlock);
 
-        int blockInterval = 0;
-        Vector2[] blockLocations = new Vector2[4];
         Vector2[] updatedBlockLocations = new Vector2[4];
-        Vector2 originLocation = new();
 
-        // Row
-        for (int i = 1; i < shapeRowStrings.Length; i++)
+        foreach (BlockInfo info in _allShapesData.BlockInfo)
         {
-            // Column
-            char[] shapeCharacters = shapeRowStrings[i].ToCharArray();
-            for (int j = 0; j < shapeCharacters.Length; j++)
-            {
-                int yIndex;
-                if (shapeCharacters[j] == 'O' || shapeCharacters[j] == 'X')
-                {
-                    yIndex = shapeCharacters.Length - i;
-                    blockLocations[blockInterval].x = j * _maxSpacing;
-                    blockLocations[blockInterval].y = yIndex * _maxSpacing;
-
-                    // Sets the rotational pivot (origin)
-                    if (shapeCharacters[j] == 'O')
-                    {
-                        originLocation.x = blockLocations[blockInterval].x;
-                        originLocation.y = blockLocations[blockInterval].y;
-                    }
-
-                    blockInterval++;
-                }
-            }
-        }
-
-        // Confines the other block locations to the origins location
-        for (int z = 0; z < blockLocations.Length; z++)
-        {
-            blockLocations[z].x -= originLocation.x;
-            blockLocations[z].y -= originLocation.y;
-            updatedBlockLocations[z] = blockLocations[z];
+            if (info.BlockType == block.BlockType) { updatedBlockLocations = info.BlockPositions; }
         }
 
         _spawnedBlock = Instantiate(_blockToSpawn, _spawnPoint.position, Quaternion.identity);
         _spawnedBlock.UpdateShape(_currentSpeed, updatedBlockLocations, this, block);
 
         SetCurrentSpeed();
-    }
-
-    private string GetShapeTextData(BlockInfo block)
-    {
-        string path = Application.dataPath + "/Resources/" + block.BlockType.ToString() + ".txt";
-        StreamReader reader = new StreamReader(path);
-        string shapeText = reader.ReadToEnd();
-        return shapeText;
     }
 
     private void SetCurrentSpeed()

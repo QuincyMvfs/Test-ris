@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,34 +10,39 @@ public class BlockInfoDownloader : MonoBehaviour
 {
 #if UNITY_EDITOR
 
-    public static BlockInfoDownloader Instance;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
-
     [MenuItem("Tools/GenerateShapeData")]
     private static void GetShapeTextData()
     {
         string path = Application.dataPath + "/Resources/";
         DirectoryInfo dir = new DirectoryInfo(path);
         FileInfo[] files = dir.GetFiles();
-       
-        AllShapesScritpableObject allShapeData = ScriptableObject.CreateInstance<AllShapesScritpableObject>();
-        allShapeData.BlockInfo = new BlockInfo[files.Length / 2];
-        for (int totalFileIndex = 0; totalFileIndex < files.Length / 2; totalFileIndex++)
+        List<FileInfo> updatedFiles = new();
+        foreach (FileInfo file in files)
         {
-            if (files[totalFileIndex].FullName.Contains(".meta"))
+            if (file.FullName.Contains(".meta")) { }
+            else
             {
-                totalFileIndex--;
-                continue;
+                updatedFiles.Add(file);
+                Debug.Log(file.FullName);
             }
+        }
 
-            StreamReader reader = new StreamReader(files[totalFileIndex].FullName);
+        AllShapesScritpableObject allShapeData = ScriptableObject.CreateInstance<AllShapesScritpableObject>();
+        allShapeData.BlockInfo = new BlockInfo[updatedFiles.Count];
+
+        for (int totalFileIndex = 0; totalFileIndex < updatedFiles.Count; totalFileIndex++)
+        {
+            StreamReader reader = new StreamReader(updatedFiles[totalFileIndex].FullName);
             string shapeText = reader.ReadToEnd();
             string[] shapeRowStrings = shapeText.Split("\n");
-            BlockTypes blockType = (BlockTypes)Enum.Parse(typeof(BlockTypes), shapeRowStrings[0]); 
+            BlockTypes blockType = BlockTypes.o_shape;
+
+            //Debug.Log(shapeRowStrings[0]);
+            if (Enum.TryParse(shapeRowStrings[0].ToLower(), out BlockTypes block))
+            {
+                blockType = block;
+            }
+
             int blockInterval = 0;
             Vector2[] blockLocations = new Vector2[4];
             Vector2[] updatedBlockLocations = new Vector2[4];
@@ -87,15 +93,24 @@ public class BlockInfoDownloader : MonoBehaviour
             allShapeData.BlockInfo[totalFileIndex] = newBlockInfo;
         }
 
+
         string name = ($"Assets/Data/AllShapeData.asset");
         if (Directory.Exists(name))
         {
-            AssetDatabase.DeleteAsset(name);
+            AllShapesScritpableObject existingData = AssetDatabase.LoadAssetAtPath<AllShapesScritpableObject>(name);
+            existingData = allShapeData;
+            EditorUtility.SetDirty(existingData);
+            AssetDatabase.SaveAssets();
         }
-        AssetDatabase.CreateAsset(allShapeData, name);
+        else
+        {
+            AssetDatabase.CreateAsset(allShapeData, name);
+        }
 
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = allShapeData;
+
     }
+
 #endif
 }

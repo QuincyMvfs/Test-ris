@@ -15,18 +15,54 @@ MonoBehaviour:
   Blocks:
   - BlockType: 0
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 1
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 2
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 3
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 4
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 5
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   - BlockType: 6
     BlockChance: 5
+    BlockPositions:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
   StartSpeed: 0.3
   StepSpeed: 0.03
   MaxSpeed: 0.01
+  ScoreRequired: 1500
