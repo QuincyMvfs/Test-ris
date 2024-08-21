@@ -12,51 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c64a8d4e3624954eb11471e2a50cfb6, type: 3}
   m_Name: AllShapeData
   m_EditorClassIdentifier: 
-  BlockInfo:
+  RawBlockInfo:
   - BlockType: 4
-    BlockChance: 5
     BlockPositions:
     - {x: 0, y: 2}
     - {x: 0, y: 1}
     - {x: 0, y: 0}
     - {x: 0, y: -1}
   - BlockType: 1
-    BlockChance: 5
     BlockPositions:
     - {x: 0, y: 1}
     - {x: 0, y: 0}
     - {x: -1, y: -1}
     - {x: 0, y: -1}
   - BlockType: 0
-    BlockChance: 5
     BlockPositions:
     - {x: 0, y: 1}
     - {x: 0, y: 0}
     - {x: 0, y: -1}
     - {x: 1, y: -1}
   - BlockType: 3
-    BlockChance: 5
     BlockPositions:
     - {x: -1, y: 1}
     - {x: 0, y: 1}
     - {x: -1, y: 0}
     - {x: 0, y: 0}
   - BlockType: 5
-    BlockChance: 5
     BlockPositions:
     - {x: 0, y: 1}
     - {x: 1, y: 1}
     - {x: -1, y: 0}
     - {x: 0, y: 0}
   - BlockType: 2
-    BlockChance: 5
     BlockPositions:
     - {x: 0, y: 1}
     - {x: -1, y: 0}
     - {x: 0, y: 0}
     - {x: 1, y: 0}
   - BlockType: 6
-    BlockChance: 5
     BlockPositions:
     - {x: -1, y: 1}
     - {x: 0, y: 1}

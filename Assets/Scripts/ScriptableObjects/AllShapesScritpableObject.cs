@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class AllShapesScritpableObject : ScriptableObject
 {
-    public BlockInfo[] BlockInfo;
+    public RawBlockInfo[] RawBlockInfo;
 }

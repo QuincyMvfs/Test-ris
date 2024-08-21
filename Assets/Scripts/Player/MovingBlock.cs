@@ -1,23 +1,30 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(ColorManager))]
 public class MovingBlock : MonoBehaviour
 {
     /// Member Variables
     // How much the block should move with any input to stay in the grid
     [SerializeField] private int _descentIncrement = 2;
     
-    // Grid Variables that a shared between each spawned shape
-    static private int _gridSizeX = 15;
-    static private int _gridSizeY = 26;
-    // 2D Transform array that use the total grid size as the inputs
-    static private Transform[,] _shapeGrid = new Transform[_gridSizeX, _gridSizeY];
+    //// Grid Variables that a shared between each spawned shape
+    //static private int _gridSizeX = 15;
+    //static private int _gridSizeY = 26;
+    //// 2D Transform array that use the total grid size as the inputs
+    //static private Transform[,] _shapeGrid = new Transform[_gridSizeX, _gridSizeY];
 
     private float _currentFallSpeed;
     BlockManipulator _manipulator;
     Vector2 _currentPos;
     private IEnumerator _currentState;
+    private ColorManager _colorManager;
     ///
+    
+    private void Awake()
+    {
+        _colorManager = GetComponent<ColorManager>();
+    }
 
     // Initializes some variables from the spawner and starts the blocks descent
     public void UpdateShape(float fallSpeed, Vector2[] positions, BlockManipulator manipulator, BlockInfo blockInfo)
@@ -27,7 +34,7 @@ public class MovingBlock : MonoBehaviour
         _manipulator = manipulator;
 
         // Sets the shapes color
-        GetShapeColor(blockInfo);
+        _colorManager.GetShapeColor(blockInfo.BlockType);
 
         // Set the position of all blocks to the input positions
         for (int i = 0; i < transform.childCount; i++)
@@ -109,7 +116,7 @@ public class MovingBlock : MonoBehaviour
             int Y = Mathf.RoundToInt(childPos.y);
 
             // Check if Block is overlapping another before decrement is done
-            if (_shapeGrid[X, Y] != null)
+            if (BlockManipulator.ShapeGrid[X, Y] != null)
             {
                 /// Fail State here
                 ChangeState(ResetState());
@@ -119,7 +126,7 @@ public class MovingBlock : MonoBehaviour
 
             // Do decrement and if its at the bottom, or will be overlapping another shape, stop moving and spawn another block
             Y -= _descentIncrement;
-            if (Y < 1 || _shapeGrid[X, Y] != null)
+            if (Y < 1 || BlockManipulator.ShapeGrid[X, Y] != null)
             {
                 ChangeState(ResetState());
                 AddShapeToGrid();
@@ -142,10 +149,10 @@ public class MovingBlock : MonoBehaviour
             int Y = Mathf.RoundToInt(childPos.y);
 
             // Check if the block is outside of the grid on the left or right
-            if (X < 1 || X >= _gridSizeX) return false;
+            if (X < 1 || X >= BlockManipulator.GridSizeX) return false;
 
             // Check if the space its going to be in, already has a shape in it
-            if (_shapeGrid[X, Y] != null) return false;
+            if (BlockManipulator.ShapeGrid[X, Y] != null) return false;
         }
 
         return true;
@@ -160,9 +167,9 @@ public class MovingBlock : MonoBehaviour
             int X = Mathf.RoundToInt(childPos.x);
             int Y = Mathf.RoundToInt(childPos.y);
 
-            if (X < 1 || X >= _gridSizeX || Y < 1) return false;
+            if (X < 1 || X >= BlockManipulator.GridSizeX || Y < 1) return false;
 
-            if (_shapeGrid[X, Y] != null) return false;
+            if (BlockManipulator.ShapeGrid[X, Y] != null) return false;
         }
 
         return true;
@@ -176,8 +183,8 @@ public class MovingBlock : MonoBehaviour
             Vector3 childPos = child.position;
             int X = Mathf.RoundToInt(childPos.x);
             int Y = Mathf.RoundToInt(childPos.y);
-            
-            _shapeGrid[X, Y] = child;
+
+            BlockManipulator.ShapeGrid[X, Y] = child;
 
             CheckForRowMatch();
         }
@@ -187,7 +194,7 @@ public class MovingBlock : MonoBehaviour
     private void CheckForRowMatch()
     {
         // Loop through each row
-        for (int i = _gridSizeY - 1; i >= 1; i--)
+        for (int i = BlockManipulator.GridSizeY - 1; i >= 1; i--)
         {
             if (CheckRow(i)) 
             {
@@ -201,10 +208,10 @@ public class MovingBlock : MonoBehaviour
     // Check if a row is full by sorting through each column in the _shapeGrid array
     private bool CheckRow(int i)
     {
-        for (int j = _gridSizeX - 1; j >= 1; j--)
+        for (int j = BlockManipulator.GridSizeX - 1; j >= 1; j--)
         {
             // If at any point theirs an empty space in the row, return false
-            if (_shapeGrid[j, i] == null) { return false; }
+            if (BlockManipulator.ShapeGrid[j, i] == null) { return false; }
         }
 
         // If there was no empty spaces, this row is full
@@ -214,13 +221,13 @@ public class MovingBlock : MonoBehaviour
     // Deletes the row that is full of shapes
     private void ClearRow(int i)
     {
-        for (int j = _gridSizeX - 1; j >= 1; j--)
+        for (int j = BlockManipulator.GridSizeX - 1; j >= 1; j--)
         {
-            if (_shapeGrid[j, i] != null) 
+            if (BlockManipulator.ShapeGrid[j, i] != null) 
             {
                 // Remove the shape visually and clear its position in the array
-                Destroy(_shapeGrid[j, i].gameObject);
-                _shapeGrid[j, i] = null; 
+                Destroy(BlockManipulator.ShapeGrid[j, i].gameObject);
+                BlockManipulator.ShapeGrid[j, i] = null; 
             }
         }
     }
@@ -229,63 +236,22 @@ public class MovingBlock : MonoBehaviour
     private void DropRows(int i)
     {
         // Check each row above the given I value for blocks that need to come down.
-        for (int y = i; y < _gridSizeY - 1; y++)
+        for (int y = i; y < BlockManipulator.GridSizeY - 1; y++)
         {
             // Check through each column
-            for (int j = _gridSizeX - 1; j >= 1; j--)
+            for (int j = BlockManipulator.GridSizeX - 1; j >= 1; j--)
             {
                 // If the block above is not null, that means it needs to come down
-                if (_shapeGrid[j, y + 1] != null)
+                if (BlockManipulator.ShapeGrid[j, y + 1] != null)
                 {
                     // Set the new position in the array, and lower its position by the Descent Increment
-                    _shapeGrid[j, y] = _shapeGrid[j, y + 1];
-                    _shapeGrid[j, y + 1] = null;
-                    Vector3 newPos = _shapeGrid[j, y].transform.position;
+                    BlockManipulator.ShapeGrid[j, y] = BlockManipulator.ShapeGrid[j, y + 1];
+                    BlockManipulator.ShapeGrid[j, y + 1] = null;
+                    Vector3 newPos = BlockManipulator.ShapeGrid[j, y].transform.position;
                     newPos.y -= _descentIncrement;
-                    _shapeGrid[j, y].transform.position = newPos;
+                    BlockManipulator.ShapeGrid[j, y].transform.position = newPos;
                 }
             }
-        }
-    }
-
-    // Gets the shape colors depending on the block info, then sets it
-    private void GetShapeColor(BlockInfo info)
-    {
-        switch (info.BlockType)
-        {
-            case BlockTypes.l_shape:
-                SetShapeColor(new Color(1, 0.7f, 0, 1));
-                break;
-            case BlockTypes.j_shape:
-                SetShapeColor(Color.blue);
-                break;
-            case BlockTypes.z_shape:
-                SetShapeColor(Color.red);
-                break;
-            case BlockTypes.s_shape:
-                SetShapeColor(Color.green);
-                break;
-            case BlockTypes.i_shape:
-                SetShapeColor(Color.cyan);
-                break;
-            case BlockTypes.t_shape:
-                SetShapeColor(Color.magenta);
-                break;
-            case BlockTypes.o_shape:
-                SetShapeColor(Color.yellow);
-                break;
-            default:
-                break;
-
-        }
-    }
-
-    private void SetShapeColor(Color color)
-    {
-        foreach (Transform t in transform)
-        {
-            SpriteRenderer renderer = t.GetComponent<SpriteRenderer>();
-            renderer.color = color;
         }
     }
 }
