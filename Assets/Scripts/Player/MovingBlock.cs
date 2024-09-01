@@ -7,12 +7,6 @@ public class MovingBlock : MonoBehaviour
     /// Member Variables
     // How much the block should move with any input to stay in the grid
     [SerializeField] private int _descentIncrement = 2;
-    
-    //// Grid Variables that a shared between each spawned shape
-    //static private int _gridSizeX = 15;
-    //static private int _gridSizeY = 26;
-    //// 2D Transform array that use the total grid size as the inputs
-    //static private Transform[,] _shapeGrid = new Transform[_gridSizeX, _gridSizeY];
 
     private float _currentFallSpeed;
     BlockManipulator _manipulator;
@@ -185,9 +179,9 @@ public class MovingBlock : MonoBehaviour
             int Y = Mathf.RoundToInt(childPos.y);
 
             BlockManipulator.ShapeGrid[X, Y] = child;
-
-            CheckForRowMatch();
         }
+        
+        CheckForRowMatch();
     }
 
     // Checks if theirs any full rows in the grid, if their is, clear the row, and drop all rows above the cleared row

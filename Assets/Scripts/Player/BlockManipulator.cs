@@ -37,6 +37,8 @@ public class BlockManipulator : MonoBehaviour
     private MovingBlock _spawnedBlock;
     private BlockInfo _nextBlock;
 
+    private int _blockIndex = 0;
+
     private void Start()
     {
         // Setting member variables from scritpable object
@@ -78,6 +80,20 @@ public class BlockManipulator : MonoBehaviour
         if (_spawnedBlock != null)
         {
             _spawnedBlock.MoveBlockX(direction);
+        }
+    }
+
+    private IEnumerator MoveBlockLoop(int direction)
+    {
+        WaitForSeconds waitTime = new WaitForSeconds(0.1f);
+        while (true)
+        {
+            if (_spawnedBlock != null)
+            {
+                _spawnedBlock.MoveBlockX(direction);
+            }
+
+            yield return waitTime;
         }
     }
 
@@ -130,6 +146,7 @@ public class BlockManipulator : MonoBehaviour
 
         // Spawns a block and updates it with the current speed and block positions
         _spawnedBlock = Instantiate(_blockToSpawn, _spawnPoint.position, Quaternion.identity);
+        _spawnedBlock.name = _blockIndex++.ToString();
         _spawnedBlock.UpdateShape(_currentSpeed, updatedBlockLocations, this, block);
 
         if (_currentSpeed > _maxSpeed) SetCurrentSpeed();
